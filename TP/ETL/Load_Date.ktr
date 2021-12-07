@@ -601,7 +601,7 @@
         <currency />
         <decimal />
         <group />
-        <nullif>20010101</nullif>
+        <nullif>20180101</nullif>
         <length>-1</length>
         <precision>-1</precision>
         <set_empty_string>N</set_empty_string>

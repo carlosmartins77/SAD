@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <transformation>
   <info>
-    <name>Load_Store</name>
+    <name>Load_FTOrders</name>
     <description />
     <extended_description />
     <trans_version />
@@ -427,9 +427,9 @@
     <clusterschemas>
     </clusterschemas>
     <created_user>-</created_user>
-    <created_date>2021/12/05 16:50:27.498</created_date>
+    <created_date>2021/12/07 15:30:47.828</created_date>
     <modified_user>-</modified_user>
-    <modified_date>2021/12/05 16:50:27.498</modified_date>
+    <modified_date>2021/12/07 15:30:47.828</modified_date>
     <key_for_session_key />
     <is_key_private>N</is_key_private>
   </info>
@@ -555,13 +555,63 @@
   </connection>
   <order>
     <hop>
-      <from>Store input</from>
-      <to>Dimension lookup/update</to>
+      <from>Orders input</from>
+      <to>OrderDate</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>OrderDate</from>
+      <to>DueDate</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>DueDate</from>
+      <to>ShippingDate</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Retrieve date Id</from>
+      <to>OrderDate</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Retrieve date Id</from>
+      <to>DueDate</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Retrieve date Id</from>
+      <to>ShippingDate</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Customer lookup</from>
+      <to>Product lookup</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Product lookup</from>
+      <to>Location lookup</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>ShippingDate</from>
+      <to>Customer lookup</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Location lookup</from>
+      <to>Select values</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Select values</from>
+      <to>FT_Sales Output</to>
       <enabled>Y</enabled>
     </hop>
   </order>
   <step>
-    <name>Store input</name>
+    <name>Orders input</name>
     <type>TableInput</type>
     <description />
     <distribute>Y</distribute>
@@ -572,8 +622,12 @@
       <schema_name />
     </partitioning>
     <connection>AW2021</connection>
-    <sql>SELECT Name, BusinessEntityID
-FROM     Sales.Store</sql>
+    <sql>SELECT Sales.SalesOrderHeader.SalesOrderID, Sales.SalesOrderDetail.SalesOrderDetailID, Sales.SalesOrderHeader.CustomerID, Sales.SalesOrderHeader.TerritoryID, Sales.SalesOrderDetail.ProductID, 
+                  Sales.SalesOrderHeader.OrderDate, Sales.SalesOrderHeader.DueDate, Sales.SalesOrderHeader.ShipDate, Sales.SalesOrderHeader.Status, Sales.SalesOrderDetail.OrderQty, 
+                  Sales.SalesOrderDetail.UnitPrice, Sales.SalesOrderHeader.TaxAmt, Sales.SalesOrderHeader.Freight, Sales.SalesOrderDetail.LineTotal
+FROM     Sales.SalesOrderHeader INNER JOIN
+                  Sales.SalesOrderDetail ON Sales.SalesOrderHeader.SalesOrderID = Sales.SalesOrderDetail.SalesOrderID
+WHERE OnlineOrderFlag = 1</sql>
     <limit>0</limit>
     <lookup />
     <execute_each_row>N</execute_each_row>
@@ -587,13 +641,171 @@ FROM     Sales.Store</sql>
       </output>
     </remotesteps>
     <GUI>
-      <xloc>200</xloc>
-      <yloc>100</yloc>
+      <xloc>160</xloc>
+      <yloc>288</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>Dimension lookup/update</name>
+    <name>OrderDate</name>
+    <type>StreamLookup</type>
+    <description />
+    <distribute>Y</distribute>
+    <custom_distribution />
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name />
+    </partitioning>
+    <from>Retrieve date Id</from>
+    <input_sorted>N</input_sorted>
+    <preserve_memory>Y</preserve_memory>
+    <sorted_list>N</sorted_list>
+    <integer_pair>N</integer_pair>
+    <lookup>
+      <key>
+        <name>OrderDate</name>
+        <field>DAY_DATE</field>
+      </key>
+      <value>
+        <name>DATE_KEY</name>
+        <rename>OrderDateKey</rename>
+        <default />
+        <type>Integer</type>
+      </value>
+    </lookup>
+    <cluster_schema />
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>352</xloc>
+      <yloc>288</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>DueDate</name>
+    <type>StreamLookup</type>
+    <description />
+    <distribute>Y</distribute>
+    <custom_distribution />
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name />
+    </partitioning>
+    <from>Retrieve date Id</from>
+    <input_sorted>N</input_sorted>
+    <preserve_memory>Y</preserve_memory>
+    <sorted_list>N</sorted_list>
+    <integer_pair>N</integer_pair>
+    <lookup>
+      <key>
+        <name>DueDate</name>
+        <field>DAY_DATE</field>
+      </key>
+      <value>
+        <name>DATE_KEY</name>
+        <rename>DueDateKey</rename>
+        <default />
+        <type>Integer</type>
+      </value>
+    </lookup>
+    <cluster_schema />
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>560</xloc>
+      <yloc>288</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>ShippingDate</name>
+    <type>StreamLookup</type>
+    <description />
+    <distribute>Y</distribute>
+    <custom_distribution />
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name />
+    </partitioning>
+    <from>Retrieve date Id</from>
+    <input_sorted>N</input_sorted>
+    <preserve_memory>Y</preserve_memory>
+    <sorted_list>Y</sorted_list>
+    <integer_pair>N</integer_pair>
+    <lookup>
+      <key>
+        <name>ShipDate</name>
+        <field>DAY_DATE</field>
+      </key>
+      <value>
+        <name>DATE_KEY</name>
+        <rename>ShipDateKey</rename>
+        <default />
+        <type>Integer</type>
+      </value>
+    </lookup>
+    <cluster_schema />
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>752</xloc>
+      <yloc>288</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Retrieve date Id</name>
+    <type>TableInput</type>
+    <description />
+    <distribute>Y</distribute>
+    <custom_distribution />
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name />
+    </partitioning>
+    <connection>AW2021DM</connection>
+    <sql>SELECT
+  DATE_KEY
+, CAST (DAY_DATE AS DATE) DAY_DATE
+FROM Dim_Date
+</sql>
+    <limit>0</limit>
+    <lookup />
+    <execute_each_row>N</execute_each_row>
+    <variables_active>N</variables_active>
+    <lazy_conversion_active>N</lazy_conversion_active>
+    <cluster_schema />
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>560</xloc>
+      <yloc>80</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Customer lookup</name>
     <type>DimensionLookup</type>
     <description />
     <distribute>Y</distribute>
@@ -604,27 +816,22 @@ FROM     Sales.Store</sql>
       <schema_name />
     </partitioning>
     <schema />
-    <table>Dim_Store</table>
+    <table>Dim_Customer</table>
     <connection>AW2021DM</connection>
     <commit>100</commit>
-    <update>Y</update>
+    <update>N</update>
     <fields>
       <key>
-        <name>BusinessEntityID</name>
-        <lookup>BusinessEntityID</lookup>
+        <name>CustomerID</name>
+        <lookup>CustomerID</lookup>
       </key>
       <date>
         <name />
         <from>date_from</from>
         <to>date_to</to>
       </date>
-      <field>
-        <name>Name</name>
-        <lookup>Name</lookup>
-        <update>Insert</update>
-      </field>
       <return>
-        <name>StoreKey</name>
+        <name>CustomerKey</name>
         <rename />
         <creation_method>tablemax</creation_method>
         <use_autoinc>N</use_autoinc>
@@ -648,8 +855,294 @@ FROM     Sales.Store</sql>
       </output>
     </remotesteps>
     <GUI>
-      <xloc>400</xloc>
-      <yloc>100</yloc>
+      <xloc>464</xloc>
+      <yloc>464</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Product lookup</name>
+    <type>DimensionLookup</type>
+    <description />
+    <distribute>Y</distribute>
+    <custom_distribution />
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name />
+    </partitioning>
+    <schema />
+    <table>Dim_Product</table>
+    <connection>AW2021DM</connection>
+    <commit>100</commit>
+    <update>N</update>
+    <fields>
+      <key>
+        <name>ProductID</name>
+        <lookup>ProductID</lookup>
+      </key>
+      <date>
+        <name />
+        <from>date_from</from>
+        <to>date_to</to>
+      </date>
+      <return>
+        <name>ProductKey</name>
+        <rename />
+        <creation_method>tablemax</creation_method>
+        <use_autoinc>N</use_autoinc>
+        <version>version</version>
+      </return>
+    </fields>
+    <sequence />
+    <min_year>1900</min_year>
+    <max_year>2199</max_year>
+    <cache_size>5000</cache_size>
+    <preload_cache>N</preload_cache>
+    <use_start_date_alternative>N</use_start_date_alternative>
+    <start_date_alternative>none</start_date_alternative>
+    <start_date_field_name />
+    <useBatch>N</useBatch>
+    <cluster_schema />
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>656</xloc>
+      <yloc>464</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Location lookup</name>
+    <type>DimensionLookup</type>
+    <description />
+    <distribute>Y</distribute>
+    <custom_distribution />
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name />
+    </partitioning>
+    <schema />
+    <table>Dim_Location</table>
+    <connection>AW2021DM</connection>
+    <commit>100</commit>
+    <update>N</update>
+    <fields>
+      <key>
+        <name>TerritoryID</name>
+        <lookup>TerritoryID</lookup>
+      </key>
+      <date>
+        <name />
+        <from>date_from</from>
+        <to>date_to</to>
+      </date>
+      <return>
+        <name>LocationKey</name>
+        <rename />
+        <creation_method>tablemax</creation_method>
+        <use_autoinc>N</use_autoinc>
+        <version>version</version>
+      </return>
+    </fields>
+    <sequence />
+    <min_year>1900</min_year>
+    <max_year>2199</max_year>
+    <cache_size>5000</cache_size>
+    <preload_cache>N</preload_cache>
+    <use_start_date_alternative>N</use_start_date_alternative>
+    <start_date_alternative>none</start_date_alternative>
+    <start_date_field_name />
+    <useBatch>N</useBatch>
+    <cluster_schema />
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>864</xloc>
+      <yloc>464</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Select values</name>
+    <type>SelectValues</type>
+    <description />
+    <distribute>Y</distribute>
+    <custom_distribution />
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name />
+    </partitioning>
+    <fields>
+      <field>
+        <name>SalesOrderID</name>
+        <rename />
+      </field>
+      <field>
+        <name>OrderDateKey</name>
+        <rename />
+      </field>
+      <field>
+        <name>DueDateKey</name>
+        <rename />
+      </field>
+      <field>
+        <name>ShipDateKey</name>
+        <rename />
+      </field>
+      <field>
+        <name>CustomerKey</name>
+        <rename />
+      </field>
+      <field>
+        <name>ProductKey</name>
+        <rename />
+      </field>
+      <field>
+        <name>LocationKey</name>
+        <rename />
+      </field>
+      <field>
+        <name>UnitPrice</name>
+        <rename />
+      </field>
+      <field>
+        <name>OrderQty</name>
+        <rename />
+      </field>
+      <field>
+        <name>Freight</name>
+        <rename />
+      </field>
+      <field>
+        <name>TaxAmt</name>
+        <rename />
+      </field>
+      <field>
+        <name>LineTotal</name>
+        <rename />
+      </field>
+      <field>
+        <name>Status</name>
+        <rename />
+      </field>
+      <select_unspecified>N</select_unspecified>
+    </fields>
+    <cluster_schema />
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1104</xloc>
+      <yloc>464</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>FT_Sales Output</name>
+    <type>TableOutput</type>
+    <description />
+    <distribute>Y</distribute>
+    <custom_distribution />
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name />
+    </partitioning>
+    <connection>AW2021DM</connection>
+    <schema />
+    <table>FT_Sales</table>
+    <commit>1000</commit>
+    <truncate>N</truncate>
+    <ignore_errors>N</ignore_errors>
+    <use_batch>Y</use_batch>
+    <specify_fields>Y</specify_fields>
+    <partitioning_enabled>N</partitioning_enabled>
+    <partitioning_field />
+    <partitioning_daily>N</partitioning_daily>
+    <partitioning_monthly>Y</partitioning_monthly>
+    <tablename_in_field>N</tablename_in_field>
+    <tablename_field />
+    <tablename_in_table>Y</tablename_in_table>
+    <return_keys>N</return_keys>
+    <return_field />
+    <fields>
+      <field>
+        <column_name>SalesOrderID</column_name>
+        <stream_name>SalesOrderID</stream_name>
+      </field>
+      <field>
+        <column_name>OrderDateKey</column_name>
+        <stream_name>OrderDateKey</stream_name>
+      </field>
+      <field>
+        <column_name>DueDateKey</column_name>
+        <stream_name>DueDateKey</stream_name>
+      </field>
+      <field>
+        <column_name>ShipDateKey</column_name>
+        <stream_name>ShipDateKey</stream_name>
+      </field>
+      <field>
+        <column_name>CustomerKey</column_name>
+        <stream_name>CustomerKey</stream_name>
+      </field>
+      <field>
+        <column_name>ProductKey</column_name>
+        <stream_name>ProductKey</stream_name>
+      </field>
+      <field>
+        <column_name>LocationKey</column_name>
+        <stream_name>LocationKey</stream_name>
+      </field>
+      <field>
+        <column_name>UnitPrice</column_name>
+        <stream_name>UnitPrice</stream_name>
+      </field>
+      <field>
+        <column_name>OrderQty</column_name>
+        <stream_name>OrderQty</stream_name>
+      </field>
+      <field>
+        <column_name>Freight</column_name>
+        <stream_name>Freight</stream_name>
+      </field>
+      <field>
+        <column_name>TaxAmt</column_name>
+        <stream_name>TaxAmt</stream_name>
+      </field>
+      <field>
+        <column_name>LineTotal</column_name>
+        <stream_name>LineTotal</stream_name>
+      </field>
+      <field>
+        <column_name>Status</column_name>
+        <stream_name>Status</stream_name>
+      </field>
+    </fields>
+    <cluster_schema />
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1104</xloc>
+      <yloc>288</yloc>
       <draw>Y</draw>
     </GUI>
   </step>

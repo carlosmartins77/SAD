@@ -588,8 +588,8 @@ FROM     Sales.Customer INNER JOIN
       </output>
     </remotesteps>
     <GUI>
-      <xloc>200</xloc>
-      <yloc>100</yloc>
+      <xloc>112</xloc>
+      <yloc>80</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -654,8 +654,8 @@ FROM     Sales.Customer INNER JOIN
       </output>
     </remotesteps>
     <GUI>
-      <xloc>400</xloc>
-      <yloc>96</yloc>
+      <xloc>320</xloc>
+      <yloc>80</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
