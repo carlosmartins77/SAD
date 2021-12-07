@@ -623,7 +623,7 @@
     </partitioning>
     <connection>AW2021</connection>
     <sql>SELECT Sales.SalesOrderHeader.SalesOrderID, Sales.SalesOrderDetail.SalesOrderDetailID, Sales.SalesOrderHeader.CustomerID, Sales.SalesOrderHeader.TerritoryID, Sales.SalesOrderDetail.ProductID, 
-                  Sales.SalesOrderHeader.OrderDate, Sales.SalesOrderHeader.DueDate, Sales.SalesOrderHeader.ShipDate, Sales.SalesOrderHeader.Status, Sales.SalesOrderDetail.OrderQty, 
+                  Sales.SalesOrderHeader.OrderDate, Sales.SalesOrderHeader.ShipDate, Sales.SalesOrderHeader.DueDate, Sales.SalesOrderHeader.Status, DATEDIFF(day,Sales.SalesOrderHeader.OrderDate,Sales.SalesOrderHeader.DueDate) AS DaysToDelivery,  Sales.SalesOrderDetail.OrderQty, 
                   Sales.SalesOrderDetail.UnitPrice, Sales.SalesOrderHeader.TaxAmt, Sales.SalesOrderHeader.Freight, Sales.SalesOrderDetail.LineTotal
 FROM     Sales.SalesOrderHeader INNER JOIN
                   Sales.SalesOrderDetail ON Sales.SalesOrderHeader.SalesOrderID = Sales.SalesOrderDetail.SalesOrderID
@@ -1036,6 +1036,10 @@ FROM Dim_Date
         <name>Status</name>
         <rename />
       </field>
+      <field>
+        <name>DaysToDelivery</name>
+        <rename />
+      </field>
       <select_unspecified>N</select_unspecified>
     </fields>
     <cluster_schema />
@@ -1131,6 +1135,10 @@ FROM Dim_Date
       <field>
         <column_name>Status</column_name>
         <stream_name>Status</stream_name>
+      </field>
+      <field>
+        <column_name>DaysToDelivery</column_name>
+        <stream_name>DaysToDelivery</stream_name>
       </field>
     </fields>
     <cluster_schema />
