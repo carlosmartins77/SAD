@@ -556,17 +556,17 @@
   <order>
     <hop>
       <from>SalesReason input</from>
-      <to>Dimension lookup/update</to>
+      <to>SalesReason lookup</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Dimension lookup/update</from>
+      <from>SalesReason lookup</from>
       <to>Select values</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
       <from>Select values</from>
-      <to>Table output</to>
+      <to>FT_SalesReason output</to>
       <enabled>Y</enabled>
     </hop>
   </order>
@@ -603,7 +603,7 @@ FROM     Sales.SalesOrderHeaderSalesReason</sql>
     </GUI>
   </step>
   <step>
-    <name>Dimension lookup/update</name>
+    <name>SalesReason lookup</name>
     <type>DimensionLookup</type>
     <description />
     <distribute>Y</distribute>
@@ -694,7 +694,7 @@ FROM     Sales.SalesOrderHeaderSalesReason</sql>
     </GUI>
   </step>
   <step>
-    <name>Table output</name>
+    <name>FT_SalesReason output</name>
     <type>TableOutput</type>
     <description />
     <distribute>Y</distribute>
